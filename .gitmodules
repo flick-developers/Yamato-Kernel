@@ -1,0 +1,12 @@
+[submodule "vendors/composefs"]
+	path = vendors/composefs
+	url = https://github.com/composefs/composefs
+[submodule "vendors/bootc"]
+	path = vendors/bootc
+	url = https://github.com/bootc-dev/bootc
+[submodule "vendors/bootupd"]
+	path = vendors/bootupd
+	url = https://github.com/coreos/bootupd
+[submodule "vendors/ostree"]
+	path = vendors/ostree
+	url = https://github.com/ostreedev/ostree
