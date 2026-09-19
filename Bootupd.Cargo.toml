@@ -1,0 +1,77 @@
+[package]
+name = "bootupd"
+description = "Bootloader updater"
+license = "Apache-2.0"
+version = "0.3.2"
+authors = ["Colin Walters <walters@verbum.org>"]
+edition = "2021"
+rust-version = "1.90.0"
+homepage = "https://github.com/coreos/bootupd"
+
+include = ["src", "LICENSE", "Makefile", "systemd", "build.rs", "packagesystem"]
+
+# See https://github.com/coreos/cargo-vendor-filterer
+[package.metadata.vendor-filter]
+platforms = ["*-unknown-linux-gnu"]
+tier = "2"
+
+# Redhat makes the package, but do not maintain it on debian's repos, thus setting this to the wrong thing could result
+# in maintainers getting bombarded with issues they do not support.
+[package.metadata.deb]
+maintainer = "Dominic Parry <why_context@pm.me>"
+copyright = "2020 Red Hat, Inc."
+depends = "$auto, libostree-1-1, systemd"
+assets = [
+  ["target/release/bootupd", "usr/bin/bootupctl", "755"],
+  ["systemd/bootloader-update.service", "usr/lib/systemd/system/", "644"],
+]
+
+[[bin]]
+name = "bootupd"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1.0"
+bootc-internal-blockdev = "1.16.0"
+bootc-internal-utils = "1.16.0"
+bootc-internal-mount = "1.16.0"
+cap-std-ext = "5.0.0"
+camino = "1.2.2"
+chrono = { version = "0.4.44", features = ["serde"] }
+clap = { version = "4.6", default-features = false, features = ["cargo", "derive", "std", "help", "usage", "suggestions"] }
+env_logger = "0.11"
+fail = { version = "0.5", features = ["failpoints"] }
+fn-error-context = "0.2.1"
+libc = "^0.2"
+libsystemd = ">= 0.3, < 0.8"
+log = "^0.4"
+cap-std = "4.0.2"
+openssl = "^0.10"
+os-release = "0.1.0"
+rustix = { version = "1.1.4", features = ["process", "fs"] }
+serde = { version = "^1.0", features = ["derive"] }
+serde_json = "^1.0"
+tempfile = "^3.26"
+uapi-version = "0.4.0"
+walkdir = "2.3.2"
+signal-hook-registry = "1.4.8"
+
+# EFI-only dependencies
+[target.'cfg(any(target_arch = "x86_64", target_arch = "aarch64", target_arch = "riscv64"))'.dependencies]
+virtfw-libefi = { version = "0.7", features = ["std", "sbdata"] }
+
+[profile.release]
+# We assume we're being delivered via e.g. RPM which supports split debuginfo
+debug = true
+
+[package.metadata.release]
+disable-push = true
+post-release-commit-message = "cargo: development version bump"
+pre-release-commit-message = "cargo: bootupd release {{version}}"
+sign-commit = true
+sign-tag = true
+tag-message = "bootupd {{version}}"
+
+[features]
+default = []
+rpm = []
